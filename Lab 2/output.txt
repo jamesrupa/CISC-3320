@@ -1,0 +1,9 @@
+Plotter
+Sucessful --> able to request 29665
+Plotter
+Sucessful --> able to request 29666
+Scanner
+Sucessful --> able to request 29667
+Printer
+Sucessful --> able to request 29668
+

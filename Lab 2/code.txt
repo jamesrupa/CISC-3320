@@ -1,0 +1,65 @@
+import os
+import random
+import time
+from threading import *
+
+# global variables --> computer resources
+SCANNERS = 4
+PRINTERS = 5
+PLOTTERS = 6
+
+# initialize semaphores
+scanner = Semaphore(SCANNERS)
+printer = Semaphore(PRINTERS)
+plotter = Semaphore(PLOTTERS)
+
+# random number picking which resource to pick
+# 1 = scanner
+# 2 = printer
+# 3 = plotter
+def randomRequest():
+    return random.randint(1, 3)
+
+# prints the requested resource type
+def computerResource(numID):
+    if numID == 1:
+        print('Resource: Printer')
+    elif numID == 2:
+        print('Resource: Scanner')
+    else:
+        print('Resource: Plotter')
+
+# request the resource if avaliable
+def task(numID):
+    if numID == 1:
+        return printer
+    elif numID == 2:
+        return scanner
+    else:
+        return plotter
+
+# routine, sequences 4 times
+for i in range(4):
+    process = os.fork()
+    if process == 0:
+        # this is child process
+        resource = randomRequest()
+        semaphoreRequest = computerResource(resource)
+        while semaphoreRequest == 0:
+            # unable to get resource
+            # wait
+            waitTime = random.randint(2, 5)
+            time.sleep(waitTime)
+            # attempts to request after waiting
+            semaphoreRequest = computerResource(resource)
+            print('Unable to request resource')
+        # able to grab resource
+        acqTask = task(resource)
+        acqTask.acquire()
+        print('Sucessful --> able to request', os.getpid())
+        waitTime = random.randint(1, 5)
+        time.sleep(waitTime)
+
+        # releases and terminates
+        acqTask.release()
+        os._exit(0)
